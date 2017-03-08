@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "cq <- read.csv(\"cq2.csv\",sep = \",\", stringsAsFactors = FALSE)\ncq <- cq[, -11]\nnames(cq) <- c('名字','户型','面积','朝向','装修','电梯','楼层','区域','价格(万元)','单价(平方米)')\n# delete the row with NA\ncq2data <-na.omit(cq)\nhead(cq2data)\n\n# delete 别墅 data\nbieshuIndex  <- grep(\"..别墅\",cq2data$户型)\ncq2data <- cq2data[-bieshuIndex,]\n\nlibrary(ggplot2)\n\ntype_tag <- c('3室2厅','4室2厅','2室2厅','1室1厅','2室1厅','1室0厅')\n# 重新划分户型(三目运算符) 这里有点问题,先曲线酒国了\nhx <- as.character(cq2data$户型)\ncq2data$type.new <- ifelse(hx  %in% type_tag, hx , '其他')\n\ntype_freq <- data.frame(table(cq2data$type.new))\n# 绘图\ntype_p <- ggplot(data = type_freq, mapping = aes(x = reorder(Var1, -Freq),y = Freq)) + geom_bar(stat = 'identity', fill = 'steelblue') + theme(axis.text.x  = element_text(angle = 30, vjust = 0.5)) + xlab('户型') + ylab('套数')\ntype_p\n",
+    "created" : 1488950532289.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3194300076",
+    "id" : "DA0C3C03",
+    "lastKnownWriteTime" : 1488980524,
+    "last_content_update" : 1488980524334,
+    "path" : "~/PycharmProjects/House/CqHouse/analysis.R",
+    "project_path" : "analysis.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

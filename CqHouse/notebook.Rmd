@@ -1,0 +1,205 @@
+---
+title: "House Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+# 1.read file
+
+```{r}
+library(dplyr)
+library(Hmisc)
+library(ggplot2)
+library(caret)
+```
+
+
+
+```{r}
+cq <- read.csv("cq2.csv",sep = ",", stringsAsFactors = FALSE)
+cq <- cq[, -11]
+names(cq) <- c('名字','户型','面积','朝向','装修','电梯','楼层','区域','价格(万元)','单价(平方米)')
+
+head(cq)
+```
+
+## clean the data, delete the rows with NA and delete the rows which is 别墅 
+
+```{r}
+# delete the row with NA
+cq2data <-na.omit(cq)
+# delete 别墅 data
+bieshuIndex  <- grep("..别墅",cq2data$户型)
+cq2data <- cq2data[-bieshuIndex,]
+head(cq2data)
+```
+
+# 2. Start to analysis the data
+
+## a. Type disturbution
+
+```{r}
+# load library
+library(ggplot2)
+
+# show the different type houses' frquency
+type_freq <- data.frame(table(cq2data$户型))
+type_p <- ggplot(data = type_freq, mapping = aes(x = reorder(Var1, -Freq),y = Freq)) + geom_bar(stat = 'identity', fill = 'steelblue') + theme(axis.text.x  = element_text(angle = 30, vjust = 0.5)) + xlab('户型') + ylab('套数')
+```
+
+```{r}
+type_p
+```
+> 我们发现只有少数几种的户型数量比较多，其余的都非常少，明显属于长尾分布类型，所以，考虑将100套一下的户型统统归为一类。设置为其他.
+
+```{r}
+type_tag <- c('3室2厅','4室2厅','2室2厅','1室1厅','2室1厅','1室0厅')
+# 重新划分户型(三目运算符) 这里有点问题,先曲线酒国了
+# as.character function can convert factor into charactor
+hx <- as.character(cq2data$户型)
+cq2data$type.new <- ifelse(hx  %in% type_tag, hx , '其他')
+
+# 查看户型分布
+type_freq <- data.frame(table(cq2data$type.new))
+# 绘图
+type_p <- ggplot(data = type_freq, mapping = aes(x = reorder(Var1, -Freq),y = Freq)) + geom_bar(stat = 'identity', fill = 'steelblue') + theme(axis.text.x  = element_text(angle = 30, vjust = 0.5)) + xlab('户型') + ylab('套数')
+type_p
+```
+
+## b. Aera and unit_price distribution test
+
+```{r}
+# split the 面积 column and transfer str into numeric
+cq2data$aera <- as.numeric(strsplit(cq2data$面积, "平米"))
+```
+
+> Aera normal distribution test
+
+```{r}
+source("norm.test.R")
+norm.test(cq2data$aera)
+```
+
+> unit_price normal distribution test
+
+```{r}
+norm.test(as.numeric(cq2data$`单价(平方米)`))
+```
+
+**As we can see from the plots above, the aera and unit_price do not satisfy the normal distribution**
+
+## Floor distribution
+```{r}
+# split the data to get floor info
+cq2data$floor <- substring(cq2data$楼层,1,3)
+# floor freq
+floor_freq <- table(cq2data$floor)
+# calculate the percent of each factor
+percent <- paste(round(prop.table(floor_freq)*100,2),'%', sep = '')
+df <- data.frame(floor_freq)
+df <- cbind(df, percent)
+df
+```
+**As the data shows above, the percent of each floor type is almost the same, except for 地下室	!!!**
+
+## Show the average unit_price of each aera in Chongqing
+
+```{r}
+# cal the average price and sort the data by region
+avg_price <- aggregate(cq2data$`单价(平方米)`, by = list(cq2data$区域), mean)
+
+# plot
+p <- ggplot(data = avg_price, mapping = aes(x = reorder(Group.1, -x), y = x, group = 1)) + geom_area(fill = 'lightgreen') + geom_line(colour = 'steelblue', size = 2) + geom_point() + xlab('') + ylab('均价') + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5))
+p
+```
+#### Obviously, 江北嘴 is the most expensive region, which is over 15000. The other places' unit_price is almost 10000 yuan.
+
+# 3. Build model
+> Use K-means algorithm to clustering all the data
+> 聚类原则：组内差距要小，组间差距要大
+> 这里选择面积、房价和单价三个数值型变量
+
+> a self-define function to show the cluster number
+
+```{r}
+tot.wssplot <- function(data, nc, seed=1234){
+  #假设分为一组时的总的离差平方和              
+  tot.wss <- (nrow(data)-1)*sum(apply(data,2,var)) 
+  for (i in 2:nc){
+    #必须指定随机种子数
+    set.seed(seed) 
+    tot.wss[i] <- kmeans(data, centers=i, iter.max = 100)$tot.withinss
+  }
+  plot(1:nc, tot.wss, type="b", xlab="Number of Clusters",
+       ylab="Within groups sum of squares",col = 'blue',
+       lwd = 2, main = 'Choose best Clusters')
+}
+```
+
+**scale函数是将一组数进行处理，默认情况下是将一组数的每个数都减去这组数的平均值后再除以这组数的均方根。**
+
+```{r}
+standard_data <- data.frame(scale(cq2data[,c('aera','单价(平方米)','价格(万元)')]))
+my.plot <- tot.wssplot(standard_data, nc=15)
+```
+When there is onlu one cluster, the group square sum of squares is biggest. When number of Cluster increas, square sum decreas. **As the plot shows, when the number is 5, square sum decreas slower. So, I decide to choose 6 as cluster numbers.**
+
+## Use kmeans to cluster the cq2data
+```{r}
+set.seed(1234)
+clust <- kmeans(x = standard_data, centers = 4, iter.max = 100)
+table(clust$cluster)
+```
+
+> show the region distribution by cluster result
+
+```{r}
+# show the region distribution by cluster result
+table(cq2data$区域,clust$cluster)
+```
+
+> cal the average aera of each type
+
+```{r}
+# cal the average aera of each type
+aggregate(cq2data$aera, list(cq2data$type.new), mean)
+```
+
+> Compare the average aera, average price and average unit_price by cluster result
+
+```{r}
+aggregate(cq2data[,c('aera','单价(平方米)','价格(万元)')], list(clust$cluster), mean)
+```
+
+
+```{r}
+p <- ggplot(data = cq2data[,c('aera','价格(万元)')], mapping = aes(x = 'aera',y = '价格(万元)', color = factor(clust$cluster)))
+p
+p <- p + geom_point(pch = 20, size = 3)
+p + scale_colour_manual(values = c("red","blue", "green", "black", "orange",'purple'))
+```
+
+```{r}
+# transfer those data into factor
+cq2data$cluster <- factor(clust$cluster)
+cq2data$floor <- factor(cq2data$floor)
+cq2data$type.new <- factor(cq2data$type.new)
+```
+
+```{r}
+# 筛选出所有因子型变量
+factors <- names(cq2data)[sapply(cq2data, class) == 'factor']
+formula <- f <- as.formula(paste('~', paste(factors, collapse = '+')))
+dummy <- dummyVars(formula = formula, data = cq2data)
+pred <- predict(dummy, newdata = cq2data)
+head(pred)
+```
+
+

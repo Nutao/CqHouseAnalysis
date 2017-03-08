@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "norm.test <- function(x, breaks = 20, alpha = 0.05,\n                      plot = TRUE){\n  if(plot == TRUE)\n  {#设置图形界面（多图合为一张图）\n    opar <- par(no.readonly = TRUE)\n    layout(matrix(c(1,1,2,3),2,2,byrow = TRUE),\n           width = c(2,2),heights = c(2,2))\n    #绘制直方图\n    hist(x, freq = FALSE, breaks = seq(min(x),\n                                       max(x), length = breaks), main = 'x的直方图',\n         ylab = '核密度值')\n    #添加核密度图\n    lines(density(x), col = 'red', lty = 1, lwd = 2)\n    #添加正态分布图\n    x <- x[order(x)]\n    lines(x, dnorm(x, mean(x), sd(x)),\n          col = 'blue', lty = 2, lwd = 2.5)\n    #添加图例\n    legend('topright',\n           legend = c('核密度曲线','正态分布曲线'),\n           col = c('red','blue'), lty = c(1,2),\n           lwd = c(2,2.5), bty = 'n')\n    #绘制Q-Q图\n    qqnorm(x, xlab = '实际分布', ylab = '正态分布',\n           main = 'x的Q-Q图', col = 'blue')\n    qqline(x)\n    #绘制P-P图\n    P <- pnorm(x, mean(x), sd(x))\n    cdf <- 0\n    for(i in 1:length(x)){cdf[i] <- sum(x <= x[i])/length(x)}\n    plot(cdf, P, xlab = '实际分布', ylab = '正态分布',\n         main = 'x的P-P图', xlim = c(0,1),\n         ylim = c(0,1), col = 'blue')\n    abline(a = 0, b = 1)\n    par(opar)\n  }\n  #定量的shapiro检验\n  if (length(x) <= 5000) {\n    shapiro <- shapiro.test(x)\n    if(shapiro$p.value > alpha)\n      print(paste('定量结果为：', 'x服从正态分布，',\n                  'P值 =',round(shapiro$p.value,5), '> 0.05'))\n    else\n      print(paste('定量结果为：', 'x不服从正态分布，',\n                  'P值 =',round(shapiro$p.value,5), '<= 0.05'))\n    shapiro\n  }\n  else {\n    ks <- ks.test(x,'pnorm')\n    if(ks$p.value > alpha)\n      print(paste('定量结果为：', 'x服从正态分布，',\n                  'P值 =',round(ks$p.value,5), '> 0.05'))\n    else\n      print(paste('定量结果为：', 'x不服从正态分布，',\n                  'P值 =',round(ks$p.value,5), '<= 0.05'))\n    ks\n  }\n}",
+    "created" : 1488980510676.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3991390887",
+    "id" : "3627C9A9",
+    "lastKnownWriteTime" : 1488980515,
+    "last_content_update" : 1488980515361,
+    "path" : "~/PycharmProjects/House/CqHouse/norm.test.R",
+    "project_path" : "norm.test.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

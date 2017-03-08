@@ -1,0 +1,2 @@
+"0","# cal the average aera of each type"
+"0","aggregate(cq2data$aera, list(cq2data$type.new), mean)"

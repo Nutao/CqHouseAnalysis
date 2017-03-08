@@ -1,0 +1,2 @@
+"0","# split the 面积 column and transfer str into numeric"
+"0","cq2data$aera <- as.numeric(strsplit(cq2data$面积, ""平米""))"

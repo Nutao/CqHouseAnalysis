@@ -1,0 +1,2 @@
+"0","standard_data <- data.frame(scale(cq2data[,c('aera','单价(平方米)','价格(万元)')]))"
+"0","my.plot <- tot.wssplot(standard_data, nc=15)"

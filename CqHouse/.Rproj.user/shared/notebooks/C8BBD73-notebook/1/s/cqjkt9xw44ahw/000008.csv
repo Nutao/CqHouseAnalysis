@@ -1,0 +1,1 @@
+"0","aggregate(cq2data[,c('aera','单价(平方米)','价格(万元)')], list(clust$cluster), mean)"

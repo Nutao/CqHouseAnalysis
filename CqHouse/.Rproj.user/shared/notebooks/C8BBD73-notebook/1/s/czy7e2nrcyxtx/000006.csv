@@ -1,0 +1,7 @@
+"0","# split the data to get floor info"
+"0","cq2data$floor <- substring(cq2data$楼层,1,3)"
+"0","floor_freq <- table(cq2data$floor)"
+"0","percent <- paste(round(prop.table(floor_freq)*100,2),'%', sep = '')"
+"0","df <- data.frame(floor_freq)"
+"0","df <- cbind(df, percent)"
+"0","df"

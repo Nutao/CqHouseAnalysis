@@ -1,0 +1,29 @@
+"0","library(dplyr)"
+"2","
+载入程辑包：‘dplyr’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(Hmisc)"
+"2","载入需要的程辑包：lattice
+"
+"2","载入需要的程辑包：survival
+"
+"2","载入需要的程辑包：Formula
+"
+"2","载入需要的程辑包：ggplot2
+"
+"2","Error in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]) : 
+  载入了名字空间‘scales’ 0.4.0，但需要的是>= 0.4.1
+"
+"2","错误: 无法载入程辑包‘ggplot2’
+"

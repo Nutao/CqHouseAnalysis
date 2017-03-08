@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1488965037484.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "73284EC7",
+    "lastKnownWriteTime" : 3255295627468218995,
+    "last_content_update" : 1488965037484,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "4743DA70",
+        "caption" : "cq2data",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=cq2data&cache_key=4743DA70",
+        "displayedObservations" : "2239",
+        "environment" : "",
+        "object" : "cq2data",
+        "preview" : "0",
+        "totalObservations" : "2239",
+        "variables" : "14"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

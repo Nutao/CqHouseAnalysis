@@ -1,0 +1,6 @@
+"0","# 筛选出所有因子型变量"
+"0","factors <- names(cq2data)[sapply(cq2data, class) == 'factor']"
+"0","formula <- f <- as.formula(paste('~', paste(factors, collapse = '+')))"
+"0","dummy <- dummyVars(formula = formula, data = cq2data)"
+"2","错误: 没有""dummyVars""这个函数
+"

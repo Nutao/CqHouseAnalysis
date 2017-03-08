@@ -1,0 +1,5 @@
+"0","# cal the average price"
+"0","avg_price <- aggregate(cq2data$`单价(平方米)`, by = list(cq2data$区域), mean)"
+"0","# plot"
+"0","p <- ggplot(data = avg_price, mapping = aes(x = reorder(Group.1, -x), y = x, group = 1)) + geom_area(fill = 'lightgreen') + geom_line(colour = 'steelblue', size = 2) + geom_point() + xlab('') + ylab('均价') + theme(axis.text.x  = element_text(angle = 90, vjust = 0.5))"
+"0","p"

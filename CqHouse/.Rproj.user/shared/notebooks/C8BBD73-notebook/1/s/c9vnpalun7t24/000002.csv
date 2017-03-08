@@ -1,0 +1,6 @@
+"0","# delete the row with NA"
+"0","cq2data <-na.omit(cq)"
+"0","# delete 别墅 data"
+"0","bieshuIndex  <- grep(""..别墅"",cq2data$户型)"
+"0","cq2data <- cq2data[-bieshuIndex,]"
+"0","head(cq2data)"

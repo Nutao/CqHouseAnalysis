@@ -1,0 +1,5 @@
+"0","# load library"
+"0","library(ggplot2)"
+"0","# show the different type houses' frquency"
+"0","type_freq <- data.frame(table(cq2data$户型))"
+"0","type_p <- ggplot(data = type_freq, mapping = aes(x = reorder(Var1, -Freq),y = Freq)) + geom_bar(stat = 'identity', fill = 'steelblue') + theme(axis.text.x  = element_text(angle = 30, vjust = 0.5)) + xlab('户型') + ylab('套数')"
